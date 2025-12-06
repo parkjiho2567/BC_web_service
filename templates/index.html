@@ -3,44 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCSFE 웹 툴박스</title>
+    <title>BCSFE 궁극의 SFE 웹 툴박스</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>⚔️ 배틀 고양이 세이브 파일 툴박스</h1>
+        <h1>⚔️ 배틀 고양이 궁극의 SFE 툴박스</h1>
         
         {% if error %}
             <div class="error">⚠️ 오류: {{ error }}</div>
         {% endif %}
+        
+        {% if success_message %}
+            <div class="success">
+                🎉 서버 통신 완료!
+                <hr>
+                {{ success_message }}
+            </div>
+        {% endif %}
 
-        <form method="POST" action="/">
+        <form method="POST" action="/"> 
             
-            <div class="section-title">💰 재화 및 경험치 설정</div>
+            <div class="section-title">🔑 계정 인증 및 통신 설정</div>
+            
+            <label for="transfer_code">Transfer Code (인계 코드):</label>
+            <input type="text" id="transfer_code" name="transfer_code" required placeholder="9자리의 영문/숫자 코드 입력">
+            
+            <label for="confirm_code">Confirmation Code (인증 코드):</label>
+            <input type="text" id="confirm_code" name="confirm_code" required placeholder="4자리의 숫자 코드 입력">
+
+            <label for="country_code">국가 코드:</label>
+            <input type="text" id="country_code" name="country_code" required value="KR" placeholder="KR, EN, JP 중 하나 입력">
+
+            <label for="device_id">디바이스 ID (임의 생성 가능):</label>
+            <input type="text" id="device_id" name="device_id" required value="FFFFFFFFFFFFFFFF" placeholder="16자리의 영문/숫자">
+
+            <div class="section-title">💰 주요 재화 및 티켓 설정</div>
             
             <label for="catfood">캣푸드 (최대 999999):</label>
             <input type="number" id="catfood" name="catfood" min="0" max="999999" required value="999999">
             
             <label for="xp">경험치 (XP):</label>
-            <input type="number" id="xp" name="xp" min="0" required value="99999999">
-            
-            <div class="section-title">🎟️ 티켓 및 아이템 설정</div>
+            <input type="number" id="xp" name="xp" min="0" required value="999999999">
+
+            <label for="np">NP (냥코 티켓):</label>
+            <input type="number" id="np" name="np" min="0" required value="99999">
 
             <label for="rare_ticket">레어 티켓:</label>
-            <input type="number" id="rare_ticket" name="rare_ticket" min="0" required value="100">
+            <input type="number" id="rare_ticket" name="rare_ticket" min="0" required value="1000">
 
             <label for="plat_ticket">플래티넘 티켓:</label>
-            <input type="number" id="plat_ticket" name="plat_ticket" min="0" required value="10">
+            <input type="number" id="plat_ticket" name="plat_ticket" min="0" required value="100">
             
-            <label for="leader">리더십 (최대 9999):</label>
-            <input type="number" id="leader" name="leader" min="0" max="9999" required value="999">
+            <div class="section-title">💊 카타민 및 캣츠아이</div>
 
-            <div class="section-title">🛠️ 편의성 기능 (ON/OFF)</div>
+            <label for="catamin_b">카타민 B:</label>
+            <input type="number" id="catamin_b" name="catamin_b" min="0" required value="999">
+            
+            <label for="catamin_c">카타민 C:</label>
+            <input type="number" id="catamin_c" name="catamin_c" min="0" required value="999">
+
+            <label for="catamin_s">카타민 S:</label>
+            <input type="number" id="catamin_s" name="catamin_s" min="0" required value="999">
+            
+            <label for="catseye_common">일반 캣츠아이 (Common):</label>
+            <input type="number" id="catseye_common" name="catseye_common" min="0" required value="999">
+
+
+            <div class="section-title">🛠️ 편의성 기능 (토글)</div>
 
             <label style="display: flex; align-items: center;">
-                <span style="flex-grow: 1;">⚡ 에너지 무제한 (리더십 자동 최대 설정)</span>
+                <span style="flex-grow: 1;">⚡ 에너지 무제한 (리더십 아이템 999 설정)</span>
                 <span class="toggle-switch">
-                    <input type="checkbox" id="infinite_energy" name="infinite_energy" value="1">
+                    <input type="checkbox" id="infinite_energy" name="infinite_energy" value="1" checked>
                     <span class="slider round"></span>
                 </span>
             </label>
@@ -48,12 +83,20 @@
             <label style="display: flex; align-items: center;">
                 <span style="flex-grow: 1;">🗺️ 트레저 레이더 무제한</span>
                 <span class="toggle-switch">
-                    <input type="checkbox" id="infinite_radar" name="infinite_radar" value="1">
+                    <input type="checkbox" id="infinite_radar" name="infinite_radar" value="1" checked>
                     <span class="slider round"></span>
                 </span>
             </label>
-
-            <button type="submit">✅ 세이브 파일 생성 및 다운로드 (.sav)</button>
+            
+            <label style="display: flex; align-items: center;">
+                <span style="flex-grow: 1;">🏆 유저 랭크 최대 (콘텐츠 해금)</span>
+                <span class="toggle-switch">
+                    <input type="checkbox" id="max_user_rank" name="max_user_rank" value="1" checked>
+                    <span class="slider round"></span>
+                </span>
+            </label>
+            
+            <button type="submit">✅ 계정 수정 및 새 인계 코드로 저장</button>
         </form>
 
     </div>
