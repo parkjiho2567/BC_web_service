@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCSFE 웹 툴박스</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ 배틀 고양이 세이브 파일 툴박스</h1>
+        
+        {% if error %}
+            <div class="error">⚠️ 오류: {{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/">
+            
+            <div class="section-title">💰 재화 및 경험치 설정</div>
+            
+            <label for="catfood">캣푸드 (최대 999999):</label>
+            <input type="number" id="catfood" name="catfood" min="0" max="999999" required value="999999">
+            
+            <label for="xp">경험치 (XP):</label>
+            <input type="number" id="xp" name="xp" min="0" required value="99999999">
+            
+            <div class="section-title">🎟️ 티켓 및 아이템 설정</div>
+
+            <label for="rare_ticket">레어 티켓:</label>
+            <input type="number" id="rare_ticket" name="rare_ticket" min="0" required value="100">
+
+            <label for="plat_ticket">플래티넘 티켓:</label>
+            <input type="number" id="plat_ticket" name="plat_ticket" min="0" required value="10">
+            
+            <label for="leader">리더십 (최대 9999):</label>
+            <input type="number" id="leader" name="leader" min="0" max="9999" required value="999">
+
+            <div class="section-title">🛠️ 편의성 기능 (ON/OFF)</div>
+
+            <label style="display: flex; align-items: center;">
+                <span style="flex-grow: 1;">⚡ 에너지 무제한 (리더십 자동 최대 설정)</span>
+                <span class="toggle-switch">
+                    <input type="checkbox" id="infinite_energy" name="infinite_energy" value="1">
+                    <span class="slider round"></span>
+                </span>
+            </label>
+            
+            <label style="display: flex; align-items: center;">
+                <span style="flex-grow: 1;">🗺️ 트레저 레이더 무제한</span>
+                <span class="toggle-switch">
+                    <input type="checkbox" id="infinite_radar" name="infinite_radar" value="1">
+                    <span class="slider round"></span>
+                </span>
+            </label>
+
+            <button type="submit">✅ 세이브 파일 생성 및 다운로드 (.sav)</button>
+        </form>
+
+    </div>
+</body>
+</html>
