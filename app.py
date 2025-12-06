@@ -1,103 +1,133 @@
-from flask import Flask, render_template, request, send_file, url_for
+from flask import Flask, render_template, request, url_for
 import bcsfe
 import io
 import os
+import random
+import time
 
 app = Flask(__name__)
 
-# BCSFE-Python 아이템 ID (버전에 따라 다를 수 있습니다. 정확한 ID 확인 필요)
+# BCSFE-Python 아이템 ID (일반적으로 사용되는 값)
+# 주의: 이 ID는 BCSFE-Python 라이브러리 버전에 따라 다를 수 있습니다.
 ITEM_IDS = {
     'RARE_TICKET': 11,
     'PLAT_TICKET': 12,
-    'TREASURE_RADAR': 15, # 예시 ID
-    'LEADERSHIP_ITEM': 13 # 리더십 아이템 ID (LeaderShip을 직접 설정하는 것과는 다름)
+    'LEADERSHIP_ITEM': 13,
+    'TREASURE_RADAR': 15,
+    'CATAMIN_B': 30,
+    'CATAMIN_C': 31,
+    'CATAMIN_S': 32,
+    'CATSEYE_COMMON': 54,
 }
 
 
-def create_hacked_save(data):
+# --- BCSFE-Python 서버 통신 및 수정 함수 (최종 구현) ---
+def process_save_via_codes(t_code, c_code, cc, did, data):
     """
-    BCSFE-Python을 사용하여 세이브 파일을 생성하고 모든 파라미터를 적용합니다.
-    :param data: 폼에서 넘어온 모든 데이터 딕셔너리
-    :return: 생성된 세이브 파일의 내용 (bytes)
+    인계 코드로 데이터를 불러와 수정하고, 다시 서버로 보내 새로운 코드를 받는 함수입니다.
     """
     try:
-        # 1. 세이브 파일 객체 생성
-        save_data = bcsfe.core.SaveFile.create_default() 
-
-        # 2. 재화 및 XP 설정
+        # 1. 인계 코드를 사용하여 냥코 서버에서 세이브 데이터 다운로드
+        print(f"Downloading save for TCode: {t_code}, CCode: {c_code}, Country: {cc}")
+        
+        save_data = bcsfe.core.Server.download_save(
+            t_code, 
+            c_code, 
+            cc, 
+            did,
+            game_version=None, # None으로 설정하면 라이브러리가 최신 버전을 시도함
+        ) 
+        
+        # 2. 치트 값 적용 (사용자 입력 전체 반영)
+        
+        # 기본 재화
         save_data.set_cat_food(data['catfood']) 
         save_data.set_xp(data['xp'])
-        save_data.set_leadership(data['leader']) # 리더십 에너지 값
-
-        # 3. 티켓 및 아이템 설정
+        save_data.set_leadership(data['leadership']) 
+        save_data.set_np(data['np'])
+        
+        # 티켓/아이템
         save_data.set_item_amount(ITEM_IDS['RARE_TICKET'], data['rare_ticket'])
         save_data.set_item_amount(ITEM_IDS['PLAT_TICKET'], data['plat_ticket'])
-
-        # 4. 편의성 기능 (토글) 적용
+        
+        # 카타민/캣츠아이
+        save_data.set_item_amount(ITEM_IDS['CATAMIN_B'], data['catamin_b'])
+        save_data.set_item_amount(ITEM_IDS['CATAMIN_C'], data['catamin_c'])
+        save_data.set_item_amount(ITEM_IDS['CATAMIN_S'], data['catamin_s'])
+        save_data.set_item_amount(ITEM_IDS['CATSEYE_COMMON'], data['catseye_common'])
+        
+        # 편의성 토글
         if data['infinite_energy']:
-             # 무한 에너지를 위해 리더십을 최대치로 설정 (LeaderShip 값과 별개로 아이템 지급)
             save_data.set_item_amount(ITEM_IDS['LEADERSHIP_ITEM'], 999) 
-            # *팁: save_data.set_unlimited_energy(True) 같은 BCSFE 기능이 있다면 활용
 
         if data['infinite_radar']:
-            # 트레저 레이더 무제한 (수량을 매우 높게 설정)
             save_data.set_item_amount(ITEM_IDS['TREASURE_RADAR'], 999) 
-
-        # 5. 세이브 파일 객체를 메모리 내의 바이트로 저장
-        output_buffer = io.BytesIO()
-        bcsfe.core.save_save_file(save_data, output_buffer)
-        output_buffer.seek(0)
+            
+        if data['max_user_rank']:
+            # 유저 랭크를 안전한 최대값으로 설정하는 기능 (예시: 99999)
+            save_data.set_user_rank(99999) 
         
-        return output_buffer
+        # 3. 수정된 세이브 데이터를 냥코 서버로 업로드 (Upload)
+        print("Uploading modified save data to server...")
+        new_t_code, new_c_code = bcsfe.core.Server.upload_save(
+            save_data, 
+            cc, 
+            did
+        ) 
+
+        # 4. 결과 메시지 반환
+        return (
+            "🎉 계정 수정 및 서버 저장이 완료되었습니다!\n"
+            f"Transfer Code: {new_t_code}\n"
+            f"Confirmation Code: {new_c_code}"
+        )
 
     except Exception as e:
-        print(f"BCSFE Error: {e}")
-        return None
+        # 서버 통신 오류, 인증 오류 등을 잡아 사용자에게 전달
+        print(f"Server Communication Error: {e}")
+        # 오류 발생 시 오류 메시지를 포함하여 다시 던집니다.
+        raise Exception(f"BCSFE 서버 통신 오류: {e}. 코드가 정확한지 확인하세요.") 
 
-
+# --- 웹 라우팅 (결과 메시지 반환) ---
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         try:
-            # 폼 데이터 수집 및 정수 변환
+            # 1. 폼 데이터 수집
+            t_code = request.form.get('transfer_code', '').strip()
+            c_code = request.form.get('confirm_code', '').strip()
+            cc = request.form.get('country_code', 'KR').upper()
+            did = request.form.get('device_id', 'FFFFFFFFFFFFFFFF').strip()
+            
+            # 모든 폼 데이터를 수집 (int 변환)
             form_data = {
-                # 재화
                 'catfood': int(request.form.get('catfood', 0)),
                 'xp': int(request.form.get('xp', 0)),
-                # 티켓 및 아이템
+                'leadership': int(request.form.get('leadership', 0)), # Leadership Energy도 추가
+                'np': int(request.form.get('np', 0)),
                 'rare_ticket': int(request.form.get('rare_ticket', 0)),
                 'plat_ticket': int(request.form.get('plat_ticket', 0)),
-                'leader': int(request.form.get('leader', 0)),
-                # 토글 버튼 (체크되지 않으면 None이 반환됨)
+                'catamin_b': int(request.form.get('catamin_b', 0)),
+                'catamin_c': int(request.form.get('catamin_c', 0)),
+                'catamin_s': int(request.form.get('catamin_s', 0)),
+                'catseye_common': int(request.form.get('catseye_common', 0)),
+                
+                # 토글 (체크되면 '1', 아니면 None -> bool로 변환)
                 'infinite_energy': request.form.get('infinite_energy') == '1',
-                'infinite_radar': request.form.get('infinite_radar') == '1'
+                'infinite_radar': request.form.get('infinite_radar') == '1',
+                'max_user_rank': request.form.get('max_user_rank') == '1'
             }
             
-            # BCSFE 로직 실행
-            save_file_buffer = create_hacked_save(form_data)
+            # 2. BCSFE 서버 통신 로직 실행
+            result_message = process_save_via_codes(t_code, c_code, cc, did, form_data)
 
-            if save_file_buffer:
-                # 파일 다운로드 응답
-                return send_file(
-                    save_file_buffer,
-                    mimetype='application/octet-stream',
-                    as_attachment=True,
-                    download_name='bcsfe_modified.sav'
-                )
-            else:
-                error_message = "세이브 파일 생성 중 심각한 오류가 발생했습니다. 서버 로그를 확인하세요."
-                return render_template('index.html', error=error_message)
+            # 3. 새로운 인계 코드를 웹 페이지에 출력
+            return render_template('index.html', success_message=result_message)
 
-        except ValueError:
-            error_message = "입력된 값 중 유효하지 않은 정수가 있습니다. 숫자를 확인해 주세요."
-            return render_template('index.html', error=error_message)
         except Exception as e:
-            error_message = f"알 수 없는 오류: {str(e)}"
+            error_message = f"계정 처리 중 오류: {str(e)}"
             return render_template('index.html', error=error_message)
             
-    # GET 요청 시 웹 페이지 렌더링
     return render_template('index.html', error=None)
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__': ...
