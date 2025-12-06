@@ -1,20 +1,22 @@
-/* static/style.css - (이전 답변과 동일) */
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-.container { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 750px; }
-h1 { color: #343a40; text-align: center; margin-bottom: 25px; border-bottom: 2px solid #dee2e6; padding-bottom: 15px; }
-.section-title { font-size: 1.2em; color: #007bff; border-left: 5px solid #007bff; padding-left: 10px; margin-top: 20px; margin-bottom: 15px; font-weight: bold; }
-label { display: block; margin: 10px 0 5px; font-weight: 600; color: #495057; }
-input[type="text"], input[type="number"], .toggle-container { width: 95%; padding: 10px; margin-bottom: 15px; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; }
-/* 토글 버튼 스타일 */
-.toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; margin-right: 15px; }
+/* static/style.css */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+.container { background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); width: 100%; max-width: 600px; }
+h1 { color: #1a1a1a; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eaeaea; padding-bottom: 20px; font-size: 24px; }
+.section-title { font-size: 16px; color: #007bff; background: #e7f1ff; padding: 8px 12px; border-radius: 6px; margin-top: 25px; margin-bottom: 15px; font-weight: 700; }
+label { display: block; margin: 12px 0 6px; font-weight: 600; color: #4a4a4a; font-size: 14px; }
+input[type="text"], input[type="number"] { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; transition: border-color 0.3s; }
+input[type="text"]:focus, input[type="number"]:focus { border-color: #007bff; outline: none; }
+
+/* 토글 스위치 */
+.toggle-wrapper { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 8px; }
+.toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: #28a745; }
-input:focus + .slider { box-shadow: 0 0 1px #28a745; }
-input:checked + .slider:before { transform: translateX(26px); }
-/* 버튼 */
-button { background-color: #28a745; color: white; padding: 15px 20px; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-size: 1.1em; margin-top: 20px; transition: background-color 0.3s; }
-button:hover { background-color: #218838; }
-.error { color: #dc3545; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold; }
-.success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold; white-space: pre-wrap; }
+input:checked + .slider:before { transform: translateX(22px); }
+/* 버튼 및 메시지 */
+button { background-color: #007bff; color: white; padding: 16px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 30px; transition: background 0.3s; }
+button:hover { background-color: #0056b3; }
+.error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+.success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; padding: 20px; border-radius: 8px; margin-bottom: 20px; white-space: pre-wrap; word-break: break-all; }
