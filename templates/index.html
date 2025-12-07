@@ -8,44 +8,23 @@
 </head>
 <body>
     <div class="container">
-        <h1>🐱 배틀 고양이 계정 에디터</h1>
+        <h1>🐱 배틀 고양이 세이브 에디터</h1>
         
         {% if error %}
-            <div class="error">🚨 <strong>오류 발생:</strong><br>{{ error }}</div>
-        {% endif %}
-        
-        {% if success_message %}
-            <div class="success">
-                ✅ <strong>작업 성공!</strong>
-                <hr style="border-top: 1px solid #c3e6cb; margin: 10px 0;">
-                {{ success_message }}
-            </div>
+            <div class="error">🚨 <strong>오류:</strong> {{ error }}</div>
         {% endif %}
 
-        <form method="POST" action="/"> 
+        <form method="POST" action="/" enctype="multipart/form-data"> 
             
-            <div class="section-title">🔑 계정 연결 (필수)</div>
-            <label>Transfer Code (인계 코드)</label>
-            <input type="text" name="transfer_code" required placeholder="예: 9자리의 코드" value="{{ request.form.transfer_code }}">
-            
-            <label>Confirmation Code (인증 코드)</label>
-            <input type="text" name="confirm_code" required placeholder="예: 1234" value="{{ request.form.confirm_code }}">
-
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label>국가 코드</label>
-                    <input type="text" name="country_code" required value="KR" placeholder="KR/EN/JP">
-                </div>
-                <div style="flex: 1;">
-                    <label>기기 ID (Device ID)</label>
-                    <input type="text" name="device_id" required value="1234567890abcdef">
-                </div>
-            </div>
+            <div class="section-title">📂 세이브 파일 선택 (.sav)</div>
+            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                기기에서 추출한 냥코 대전쟁 세이브 파일(.sav)을 선택하세요.
+            </p>
+            <input type="file" name="save_file" accept=".sav" required style="padding: 10px; background: white;">
 
             <div class="section-title">💎 재화 설정</div>
             <label>통조림 (Cat Food)</label>
             <input type="number" name="catfood" value="45000" max="45000">
-            <small style="color:red; display:block; margin-bottom:10px;">* 45,000개 초과 시 정지 위험 높음</small>
             
             <label>경험치 (XP)</label>
             <input type="number" name="xp" value="99999999">
@@ -53,37 +32,22 @@
             <label>NP (냥코 포인트)</label>
             <input type="number" name="np" value="50000">
 
-            <div class="section-title">🎫 티켓 설정</div>
+            <div class="section-title">🎫 티켓 및 아이템 설정</div>
             <label>레어 티켓</label>
             <input type="number" name="rare_ticket" value="290">
             
             <label>플래티넘 티켓</label>
             <input type="number" name="plat_ticket" value="9">
 
-            <div class="section-title">⚡ 편의 기능 (ON/OFF)</div>
             <div class="toggle-wrapper">
-                <span>리더십(에너지) 무제한</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" name="infinite_energy" value="1" checked>
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            <div class="toggle-wrapper">
-                <span>아이템(트레저 레이더 등) 무제한</span>
+                <span>리더십/트레저 레이더 등 주요 아이템 999개</span>
                 <label class="toggle-switch">
                     <input type="checkbox" name="infinite_items" value="1" checked>
                     <span class="slider round"></span>
                 </label>
             </div>
-            <div class="toggle-wrapper">
-                <span>모든 캐릭터 해금 (주의)</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" name="unlock_all_cats" value="1">
-                    <span class="slider round"></span>
-                </label>
-            </div>
             
-            <button type="submit">서버 전송 및 코드 받기 🚀</button>
+            <button type="submit">파일 수정 및 다운로드 📥</button>
         </form>
     </div>
 </body>
